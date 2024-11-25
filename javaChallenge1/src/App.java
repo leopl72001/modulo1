@@ -3,9 +3,32 @@ import java.util.Scanner;
 
 public class App {
     public static void main(String[] args) throws Exception {
-      
-
+       
+        
     }
+
+    private static void randomEvents(Scanner input, Random random) throws InterruptedException {
+        var randomMethod = random.nextInt(4);
+
+        switch (randomMethod) {
+            case 0:
+                motorOff(input, random);
+                break;
+            case 1:
+                overload(input, random);
+                break;
+            case 2:
+                motorFailure(input, random);
+                break;
+            case 3:
+                asteroidRain(input, random);
+                break;
+            default:
+                System.err.println("error no se ha selecionado un metodo valido");
+                break;
+        }
+    }
+
     private static void motorOff(Scanner input, Random random) throws InterruptedException {
         System.out.println("|-----------------------------------|");
         System.out.println("|             ALERTA!!!             |");
@@ -41,7 +64,8 @@ public class App {
             System.out.println("|-----------------------------------|");
             System.out.println("|       ¿Cuánto es " + operation[randomIndex] + "?           |");
             System.out.println("|-----------------------------------|");
-            System.out.print("   \nRespuesta: " + (userResponse.isEmpty() ? "" : userResponse)); // Mostrar la respuesta o espacio vacío
+            System.out.print("   \nRespuesta: " + (userResponse.isEmpty() ? "" : userResponse)); // Mostrar la respuesta
+                                                                                                 // o espacio vacío
 
             // Leer la respuesta del usuario
             if (input.hasNext()) {
@@ -61,16 +85,18 @@ public class App {
                         userResponse = ""; // Borrar la respuesta incorrecta
                     }
                 } catch (NumberFormatException e) {
-                    // Si ocurre un error de formato (el usuario no ingresa un número), muestra un mensaje y sigue pidiendo una respuesta válida
+                    // Si ocurre un error de formato (el usuario no ingresa un número), muestra un
+                    // mensaje y sigue pidiendo una respuesta válida
                     System.err.println("Entrada no válida. Por favor ingresa un número.");
                 }
             }
 
             // Calcular el tiempo restante
             long elapsedTime = (System.currentTimeMillis() - startTime) / 1000; // Tiempo transcurrido en segundos
-            seconds = 15 - (int)elapsedTime; // Actualizar los segundos restantes
+            seconds = 15 - (int) elapsedTime; // Actualizar los segundos restantes
 
-            // Si el tiempo aún no ha pasado, esperar 1 segundo antes de la siguiente actualización
+            // Si el tiempo aún no ha pasado, esperar 1 segundo antes de la siguiente
+            // actualización
             if (seconds >= 0) {
                 Thread.sleep(1000); // Pausa de 1 segundo
             }
@@ -90,7 +116,6 @@ public class App {
         }
     }
 
-    
     private static void overload(Scanner scanner, Random random) throws InterruptedException {
         int[] todosLosNumeros = { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
         // Crear un array para la secuencia aleatoria de 3 números
@@ -98,7 +123,8 @@ public class App {
 
         // Seleccionar 3 números aleatorios de los 9 posibles
         for (int i = 0; i < secuencia.length; i++) {
-            int indiceAleatorio = random.nextInt(todosLosNumeros.length - i); // índice aleatorio para los números restantes
+            int indiceAleatorio = random.nextInt(todosLosNumeros.length - i); // índice aleatorio para los números
+                                                                              // restantes
             secuencia[i] = todosLosNumeros[indiceAleatorio];
             // Desplazar el número seleccionado al final para evitar repetirlo
             todosLosNumeros[indiceAleatorio] = todosLosNumeros[todosLosNumeros.length - i - 1];
@@ -125,7 +151,8 @@ public class App {
         int[] respuestaUsuario = new int[3];
         for (int i = 0; i < secuencia.length; i++) {
             // Asegurar que el tiempo se actualice en cada ciclo
-            long elapsedTime = (System.currentTimeMillis() - startTime) / 1000; // Calcular el tiempo transcurrido en segundos
+            long elapsedTime = (System.currentTimeMillis() - startTime) / 1000; // Calcular el tiempo transcurrido en
+                                                                                // segundos
             tiempoRestante = 9 - (int) elapsedTime; // Actualizar el tiempo restante
 
             if (tiempoRestante <= 0) {
@@ -166,7 +193,6 @@ public class App {
         System.out.println("|       correctamente!       |");
         System.out.println("|----------------------------|");
     }
-
 
     private static void motorFailure(Scanner scanner, Random random) {
         int code = random.nextInt(30) + 1;
@@ -237,11 +263,10 @@ public class App {
                 System.err.println("|   ¡Error! Entrada no válida. Ingresa    |");
                 System.err.println("|      un número entre 1 y 30.            |");
                 System.err.println("|-----------------------------------------|");
-                
+
             }
         }
     }
-
 
     private static void asteroidRain(Scanner input, Random random) throws InterruptedException {
         System.out.println("|-----------------------------------|");
@@ -307,12 +332,10 @@ public class App {
         }
     }
 
-
     public static void clearScreen() {
         System.out.print("\033[H\033[2J");
         System.out.flush();
     }
- 
 
     private static void pressEnter(Scanner input) {
         System.out.print("Presiona ENTER para continuar");
