@@ -6,28 +6,43 @@ public class App {
     private static final Random random = new Random(); // Generador de números aleatorios
 
     public static void main(String[] args) {
-        boolean exit = false;
+        boolean playAgain = true; // Condición para seguir jugando
 
-        while (!exit) {
-            showMenu();
-            System.out.print("Seleccione una opción: ");
-            int option = scanner.nextInt();
+        while (playAgain) {
+            // Menú principal del juego
+            boolean exit = false;
+            while (!exit) {
+                showMenu();
+                System.out.print("Seleccione una opción: ");
+                int option = scanner.nextInt();
+                scanner.nextLine(); // Limpiar el buffer de entrada
 
-            switch (option) {
-                case 1 -> selectPlanet();
-                case 2 -> selectShip();
-                case 3 -> {
-                    try {
-                        travelSimulator();
-                    } catch (InterruptedException e) {
-                        System.err.println("Error en la simulación: " + e.getMessage());
+                switch (option) {
+                    case 1 -> selectPlanet();
+                    case 2 -> selectShip();
+                    case 3 -> {
+                        try {
+                            travelSimulator(); // Inicia la simulación
+                        } catch (InterruptedException e) {
+                            System.err.println("Error en la simulación: " + e.getMessage());
+                        }
                     }
+                    case 4 -> {
+                        System.out.println("Saliendo del simulador...");
+                        exit = true; // Termina el ciclo de juego si elige "Salir"
+                    }
+                    default -> System.err.println("Opción no válida. Intente de nuevo.");
                 }
-                case 4 -> {
-                    System.out.println("Saliendo del simulador...");
-                    exit = true;
-                }
-                default -> System.err.println("Opción no válida. Intente de nuevo.");
+            }
+
+            // Preguntar si desea jugar de nuevo después de completar el juego
+            System.out.println("\n¿Quieres volver a jugar? (1 para sí, 2 para no)");
+            int playAgainOption = scanner.nextInt();
+            scanner.nextLine(); // Limpiar el buffer
+
+            playAgain = (playAgainOption == 1); // Si elige "1", reinicia el juego
+            if (!playAgain) {
+                System.out.println("Gracias por jugar. ¡Hasta luego!");
             }
         }
 
@@ -53,6 +68,7 @@ public class App {
 
         System.out.print("Seleccione un planeta (1-3): ");
         int option = scanner.nextInt();
+        scanner.nextLine();
 
         if (option >= 1 && option <= planet.length) {
             System.out.println("Planeta seleccionado: " + planet[option - 1]);
@@ -74,6 +90,7 @@ public class App {
 
         System.out.print("Seleccione una nave (1-3): ");
         int option = scanner.nextInt();
+        scanner.nextLine();
 
         if (option >= 1 && option <= ship.length) {
             System.out.println("Nave seleccionada: " + ship[option - 1]);
@@ -84,36 +101,63 @@ public class App {
     }
 
     public static void travelSimulator() throws InterruptedException {
-        System.out.println("\nIniciando simulación del viaje...");
-        int progress = 0;
+        System.out.println("Iniciando simulación del viaje...");
 
-        while (progress < 100) {
-            progress += 20; // Incremento del progreso en 20%
-            System.out.println("Progreso: " + progress + "% completado");
+        // Simulamos progreso
+        for (int i = 20; i <= 100; i += 20) {
+            System.out.println("Progreso: " + i + "% completado");
+            Thread.sleep(1000); // Espera 1 segundo entre incrementos
 
-            if (Math.random() < 0.5) { // Evento aleatorio con 50% de probabilidad
-                System.out.println("¡Evento inesperado! Iniciando...");
-                randomEvents();
+            // Llamamos a los eventos aleatorios durante el progreso
+            if (Math.random() < 0.5) { // Evento aleatorio con una probabilidad del 50%
+                randomEvents(scanner, random); // Llamamos al evento aleatorio
             }
-
-            Thread.sleep(1000); // Simula tiempo real (1 segundo)
         }
 
         System.out.println("¡Viaje completado con éxito!");
-    }
 
-    private static void randomEvents() throws InterruptedException {
-        int randomMethod = random.nextInt(4); // Selección aleatoria del evento
-        switch (randomMethod) {
-            case 0 -> motorOff(scanner, random);
-            case 1 -> overload(scanner, random);
-            case 2 -> motorFailure(scanner, random);
-            case 3 -> asteroidRain(scanner, random);
-            default -> System.err.println("Error: evento aleatorio no válido.");
+        // Preguntar si desea jugar de nuevo
+        System.out.println("\n¿Quieres volver a jugar? (1 para sí, 2 para no)");
+        int playAgainOption = scanner.nextInt();
+        scanner.nextLine(); // Limpiar el buffer
+
+        if (playAgainOption == 1) {
+            // Reiniciar el menú si el usuario elige "sí"
+            System.out.println("¡Volveremos a iniciar el juego!");
+        } else if (playAgainOption == 2) {
+            // Finalizar el programa si el usuario elige "no"
+            System.out.println("Gracias por jugar. ¡Hasta luego!");
+            System.exit(0); // Cerrar el programa
+        } else {
+            System.out.println("Opción no válida. El programa se cerrará.");
+            System.exit(0); // Cerrar el programa si se ingresa una opción incorrecta
         }
     }
 
-    private static void motorOff(Scanner input, Random random) throws InterruptedException {
+    private static boolean randomEvents(Scanner scanner, Random random) throws InterruptedException {
+        int randomMethod = random.nextInt(4); // Selección aleatoria del evento (0-3)
+
+        switch (randomMethod) {
+            case 0 -> {
+                return motorOff(scanner, random);
+            }
+            case 1 -> {
+                return overload(scanner, random);
+            }
+            case 2 -> {
+                return motorFailure(scanner, random);
+            }
+            case 3 -> {
+                return asteroidRain(scanner, random);
+            }
+            default -> {
+                System.err.println("Error: evento aleatorio no válido.");
+                return false;
+            }
+        }
+    }
+
+    private static boolean motorOff(Scanner scanner, Random random) throws InterruptedException {
         System.out.println("|-----------------------------------|");
         System.out.println("|             ALERTA!!!             |");
         System.out.println("|-----------------------------------|");
@@ -121,7 +165,7 @@ public class App {
         System.out.println("|    se apagara si no corriges      |");
         System.out.println("|             la falla              |");
         System.out.println("|-----------------------------------|");
-        pressEnter(input);
+        pressEnter(scanner);
 
         int seconds = 15;
         String[] operation = { "7 x 8", "8 x 8", "7 x 7", "77 x 88" };
@@ -152,13 +196,13 @@ public class App {
                                                                                                  // o espacio vacío
 
             // Leer la respuesta del usuario
-            if (input.hasNext()) {
-                String inputResponse = input.next(); // Captura lo que el usuario ingresa
+            if (scanner.hasNext()) {
+                String scannerResponse = scanner.next(); // Captura lo que el usuario ingresa
 
                 // Verificar si la entrada es un número entero
                 try {
-                    int answer = Integer.parseInt(inputResponse); // Intenta convertir la respuesta a un número entero
-                    userResponse = inputResponse; // Actualiza la respuesta del usuario
+                    int answer = Integer.parseInt(scannerResponse); // Intenta convertir la respuesta a un número entero
+                    userResponse = scannerResponse; // Actualiza la respuesta del usuario
 
                     // Comprobar si la respuesta es correcta
                     if (answer == result[randomIndex]) {
@@ -192,26 +236,28 @@ public class App {
             System.out.println("| ¡Felicidades! Has corregido la    |");
             System.out.println("|        falla de la nave.          |");
             System.out.println("|-----------------------------------|");
+            return true; // Éxito
         } else {
             System.out.println("|-----------------------------------|");
             System.out.println("|        ¡Se acabó el tiempo!       |");
             System.out.println("|      La nave ha sido apagada.     |");
             System.out.println("|-----------------------------------|");
+            scanner.close();
+            return false; // Fallo// Termina el programa si el tiempo se agotó
         }
     }
 
-    private static void overload(Scanner scanner, Random random) throws InterruptedException {
-        int[] todosLosNumeros = { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
-        // Crear un array para la secuencia aleatoria de 3 números
-        int[] secuencia = new int[3];
+    private static boolean overload(Scanner scanner, Random random) throws InterruptedException {
+        int[] numbers = { 1, 2, 3, 4, 5, 6, 7, 8, 9 }; // Números disponibles
+        int[] sequence = new int[3]; // Secuencia aleatoria de 3 números
 
-        // Seleccionar 3 números aleatorios de los 9 posibles
-        for (int i = 0; i < secuencia.length; i++) {
-            int indiceAleatorio = random.nextInt(todosLosNumeros.length - i); // índice aleatorio para los números
-                                                                              // restantes
-            secuencia[i] = todosLosNumeros[indiceAleatorio];
+        // Crear la secuencia aleatoria
+        for (int i = 0; i < sequence.length; i++) {
+            int randomIndex = random.nextInt(numbers.length - i); // índice aleatorio
+            sequence[i] = numbers[randomIndex];
+
             // Desplazar el número seleccionado al final para evitar repetirlo
-            todosLosNumeros[indiceAleatorio] = todosLosNumeros[todosLosNumeros.length - i - 1];
+            numbers[randomIndex] = numbers[numbers.length - i - 1];
         }
 
         System.out.println("|-------------------------------|");
@@ -221,65 +267,71 @@ public class App {
         pressEnter(scanner);
 
         System.out.println("\nApaga los sistemas en este orden:");
-        // Mostrar la secuencia de números aleatoria
-        for (int num : secuencia) {
+        for (int num : sequence) {
             System.out.print(num + " ");
         }
         System.out.println();
 
-        // Inicializar el temporizador
-        int tiempoRestante = 9;
+        int timeRemaining = 9; // Tiempo total
         long startTime = System.currentTimeMillis(); // Tiempo inicial
 
-        // Pedir al usuario que ingrese los números en el orden correcto
-        int[] respuestaUsuario = new int[3];
-        for (int i = 0; i < secuencia.length; i++) {
-            // Asegurar que el tiempo se actualice en cada ciclo
-            long elapsedTime = (System.currentTimeMillis() - startTime) / 1000; // Calcular el tiempo transcurrido en
-                                                                                // segundos
-            tiempoRestante = 9 - (int) elapsedTime; // Actualizar el tiempo restante
+        // Leer los números en el orden correcto
+        int[] userResponse = new int[3]; // Respuestas del usuario
 
-            if (tiempoRestante <= 0) {
+        for (int i = 0; i < sequence.length; i++) {
+            // Calcular el tiempo restante en cada iteración
+            long elapsedTime = (System.currentTimeMillis() - startTime) / 1000; // Tiempo transcurrido
+            timeRemaining = 9 - (int) elapsedTime; // Actualizar el tiempo restante
+
+            if (timeRemaining <= 0) {
                 System.out.println("|---------------------------------|");
-                System.out.println("|       se acabo el tiempo.       |");
+                System.out.println("|       ¡Se acabó el tiempo!      |");
                 System.out.println("|       Sobrecarga mantenida      |");
                 System.out.println("|       ¡La nave explotará!       |");
                 System.out.println("|---------------------------------|");
-                scanner.close();
-                return; // Termina el programa si el tiempo se agotó
+                return false; // Se acabó el tiempo, falla
             }
 
-            System.out.println("\n|-----------------------|");
-            System.out.println("    Tienes " + tiempoRestante + " segundos   ");
             System.out.println("|-----------------------|");
-            System.out.print("\nIntroduce el número " + (i + 1) + ": ");
-            respuestaUsuario[i] = scanner.nextInt();
+            System.out.println("    Tienes " + timeRemaining + " segundos   ");
+            System.out.println("|-----------------------|");
 
-            // Si la secuencia es incorrecta, termina el ciclo
-            if (respuestaUsuario[i] != secuencia[i]) {
+            // Limpiar el buffer antes de leer la entrada
+            scanner.nextLine(); // Limpiar el buffer antes de tomar la nueva entrada
+
+            // Leer la entrada del usuario para el número
+            System.out.print("\nIntroduce el número " + (i + 1) + ": ");
+
+            while (!scanner.hasNextInt()) { // Verificar que la entrada es un número
+                System.out.println("¡Entrada no válida! Por favor ingresa un número.");
+                scanner.next(); // Descartar la entrada incorrecta
+            }
+
+            userResponse[i] = scanner.nextInt(); // Guardar el número
+
+            // Verificar si la secuencia es correcta
+            if (userResponse[i] != sequence[i]) {
                 System.out.println("|---------------------------------|");
                 System.out.println("|      Error en la secuencia.     |");
                 System.out.println("|       Sobrecarga mantenida      |");
                 System.out.println("|       ¡La nave explotará!       |");
                 System.out.println("|---------------------------------|");
-                scanner.close();
-                return;
+                return false; // Secuencia incorrecta
             }
 
-            // Esperar 1 segundo antes de pedir el siguiente número
-            Thread.sleep(1000);
+            Thread.sleep(1000); // Esperar 1 segundo antes de la siguiente entrada
         }
 
-        // Si el usuario ingresa correctamente todos los números antes de que se agote
-        // el tiempo
+        // Si todos los números fueron correctos
         System.out.println("\n|----------------------------|");
         System.out.println("|    ¡Sistemas apagados      |");
         System.out.println("|       correctamente!       |");
         System.out.println("|----------------------------|");
+        return true; // Éxito
     }
 
-    private static void motorFailure(Scanner scanner, Random random) {
-        int code = random.nextInt(30) + 1;
+    private static boolean motorFailure(Scanner scanner, Random random) {
+        int code = random.nextInt(30) + 1; // Genera un código aleatorio entre 1 y 30.
 
         System.out.println("|-----------------------------------|");
         System.out.println("|             Alerta!!!             |");
@@ -289,7 +341,7 @@ public class App {
         pressEnter(scanner);
 
         System.out.println("\n|-------------------------------------------|");
-        System.out.println("|              para repararlo               |");
+        System.out.println("|              Para repararlo              |");
         System.out.println("|       Adivina el número entre 1 y 30.     | ");
         System.out.println("|            Tienes 20 segundos.            |");
         System.out.println("|-------------------------------------------|");
@@ -305,10 +357,10 @@ public class App {
             // Verificar si el tiempo se ha agotado
             if (timeRemaining <= 0) {
                 System.out.println("\n|-----------------------------------|");
-                System.out.println("|   ¡Se acabó el tiempo! el Motor   |");
+                System.out.println("|   ¡Se acabó el tiempo! El motor  |");
                 System.out.println("|      murió, tal como te pasará.   |");
                 System.out.println("|-----------------------------------|");
-                break;
+                return false; // Termina el método indicando fallo
             }
 
             System.out.println("\n|---------------------------------------------|");
@@ -317,14 +369,15 @@ public class App {
             System.out.print("\nIntroduce tu intento: ");
 
             try {
-                int attempt = Integer.parseInt(scanner.nextLine().trim()); // Validar entrada
+                String input = scanner.nextLine().trim(); // Usamos nextLine para capturar la entrada completa
+                int attempt = Integer.parseInt(input); // Intentamos convertirlo a un número entero
 
                 if (attempt == code) {
                     System.out.println("\n|-----------------------------------|");
                     System.out.println("|     ¡Código correcto! Motor       |");
                     System.out.println("|         restaurado.               |");
                     System.out.println("|-----------------------------------|");
-                    break;
+                    return true; // Devuelve true si el código es correcto
                 } else {
                     int difference = Math.abs(code - attempt);
 
@@ -343,23 +396,23 @@ public class App {
                     }
                 }
             } catch (NumberFormatException e) {
+                // Captura la excepción si no se ingresa un número válido
                 System.err.println("|-----------------------------------------|");
                 System.err.println("|   ¡Error! Entrada no válida. Ingresa    |");
                 System.err.println("|      un número entre 1 y 30.            |");
                 System.err.println("|-----------------------------------------|");
-
             }
         }
     }
 
-    private static void asteroidRain(Scanner input, Random random) throws InterruptedException {
+    private static boolean asteroidRain(Scanner scanner, Random random) throws InterruptedException {
         System.out.println("|-----------------------------------|");
         System.out.println("|             ALERTA!!!             |");
         System.out.println("|-----------------------------------|");
         System.out.println("|    Presentamos una lluvia de      |");
         System.out.println("|            meteoritos             |");
         System.out.println("|-----------------------------------|");
-        pressEnter(input);
+        pressEnter(scanner);
 
         int seconds = 10;
         String[] country = { "E.E.U.U", "COLOMBIA", "CHIPRE", "ARGENTINA", "RUMANIA", "INDONESIA" };
@@ -368,28 +421,24 @@ public class App {
 
         boolean solved = false;
         String userResponse = "";
-
         long startTime = System.currentTimeMillis();
 
         while (seconds >= 0) {
-            clearScreen(); // Limpia la consola en cada iteración
-
             System.out.println("|-----------------------------------|");
             System.out.println("|      Para activar el escudo       |");
             System.out.println("| Di la capital de: " + country[randomIndex] + "         |");
             System.out.println("| Tienes " + seconds + " segundos            |");
             System.out.println("|-----------------------------------|");
-            System.out.print("\nRespuesta: " + (userResponse.isEmpty() ? "" : userResponse));
+            System.out.print("\nRespuesta: " + (userResponse.isEmpty() ? "" : userResponse) + "\n");
 
-            if (input.hasNextLine()) {
-                userResponse = input.nextLine().trim(); // Lee y limpia la entrada del usuario
-
+            if (scanner.hasNextLine()) {
+                userResponse = scanner.nextLine().trim();
                 if (userResponse.equalsIgnoreCase(result[randomIndex])) {
-                    solved = true; // Marca como resuelto si es correcto
+                    solved = true;
                     break;
                 } else {
                     System.out.println("Respuesta incorrecta. Intenta de nuevo");
-                    userResponse = ""; // Limpia la respuesta para el próximo intento
+                    userResponse = "";
                 }
             }
 
@@ -401,18 +450,18 @@ public class App {
             }
         }
 
-        clearScreen(); // Limpia la consola antes de mostrar el resultado final
-
         if (solved) {
             System.out.println("|-----------------------------------|");
             System.out.println("|     ¡Felicidades! Has podido      |");
             System.out.println("|        activar el escudo          |");
             System.out.println("|-----------------------------------|");
+            return true; // Éxito
         } else {
             System.out.println("|-----------------------------------|");
             System.out.println("|        ¡Se acabó el tiempo!       |");
             System.out.println("|      Prepárate para morir!!!      |");
             System.out.println("|-----------------------------------|");
+            return false; // Fallo
         }
     }
 
@@ -421,8 +470,8 @@ public class App {
         System.out.flush();
     }
 
-    private static void pressEnter(Scanner input) {
+    private static void pressEnter(Scanner scanner) {
         System.out.print("Presiona ENTER para continuar");
-        input.nextLine();
+        scanner.nextLine();
     }
 }
