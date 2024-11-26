@@ -1,9 +1,13 @@
+
 import java.util.Random;
+
 import java.util.Scanner;
 
 public class App {
     private static final Scanner scanner = new Scanner(System.in); // Scanner global
+
     private static final Random random = new Random(); // Generador de números aleatorios
+
 
     public static void main(String[] args) {
         boolean salir = false;
@@ -16,6 +20,9 @@ public class App {
             switch (opcion) {
                 case 1 -> seleccionarPlaneta();
                 case 2 -> seleccionarNave();
+
+                case 3 -> simularViaje();
+
                 case 3 -> {
                     try {
                         simularViaje();
@@ -23,6 +30,7 @@ public class App {
                         System.err.println("Error en la simulación: " + e.getMessage());
                     }
                 }
+
                 case 4 -> {
                     System.out.println("Saliendo del simulador...");
                     salir = true;
@@ -43,8 +51,13 @@ public class App {
     }
 
     public static void seleccionarPlaneta() {
+
+        String[] planetas = {"Marte", "Júpiter", "Saturno"};
+        int[] distancias = {225000000, 778000000, 1427000000};
+
         String[] planetas = { "Marte", "Júpiter", "Saturno" };
         int[] distancias = { 225000000, 778000000, 1427000000 };
+
 
         System.out.println("\nPlanetas disponibles:");
         for (int i = 0; i < planetas.length; i++) {
@@ -63,8 +76,13 @@ public class App {
     }
 
     public static void seleccionarNave() {
+
+        String[] naves = {"Nave A (100,000 km/h)", "Nave B (150,000 km/h)", "Nave C (200,000 km/h)"};
+        int[] velocidades = {100000, 150000, 200000};
+
         String[] naves = { "Nave A (100,000 km/h)", "Nave B (150,000 km/h)", "Nave C (200,000 km/h)" };
         int[] velocidades = { 100000, 150000, 200000 };
+
 
         System.out.println("\nNaves disponibles:");
         for (int i = 0; i < naves.length; i++) {
@@ -82,7 +100,11 @@ public class App {
         }
     }
 
+
+    public static void simularViaje() {
+
     public static void simularViaje() throws InterruptedException {
+
         System.out.println("\nIniciando simulación del viaje...");
         int progreso = 0;
 
@@ -91,6 +113,30 @@ public class App {
             System.out.println("Progreso: " + progreso + "% completado");
 
             if (Math.random() < 0.5) { // Evento aleatorio con 50% de probabilidad
+
+                System.out.println("¡Evento inesperado! Asteroide detectado.");
+                System.out.println("¿Qué deseas hacer?");
+                System.out.println("1. Esquivar el asteroide");
+                System.out.println("2. Reducir velocidad");
+
+                int decision = scanner.nextInt();
+
+                if (decision == 1) {
+                    System.out.println("Asteroide esquivado con éxito.");
+                } else {
+                    System.out.println("Velocidad reducida, pero estás a salvo.");
+                }
+            }
+
+            try {
+                Thread.sleep(1000); // Simula tiempo real (1 segundo)
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
+        System.out.println("¡Viaje completado con éxito!");
+
                 System.out.println("¡Evento inesperado! Iniciando...");
                 randomEvents();
             }
@@ -423,5 +469,7 @@ public class App {
     private static void pressEnter(Scanner input) {
         System.out.print("Presiona ENTER para continuar");
         input.nextLine();
+
     }
 }
+
