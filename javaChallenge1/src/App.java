@@ -79,8 +79,8 @@ public class App {
     }
 
     public static void selectShip() {
-        String[] ship = { "Nebula Vortex (100,000 km/h) capacidad max 8", "Nova Spectre (150,000 km/h) capacidad max 4",
-                "Vanguard X (200,000 km/h) capacidad max 3" };
+        String[] ship = { "Falcon (100,000 km/h) capacidad max 8", "Millenium (150,000 km/h) capacidad max 4",
+                "Pegazo (200,000 km/h) capacidad max 3" };
         int[] speed = { 100000, 150000, 200000 };
 
         System.out.println("\nNaves disponibles:");
@@ -331,7 +331,7 @@ public class App {
     }
 
     private static boolean motorFailure(Scanner scanner, Random random) {
-        int code = random.nextInt(30) + 1; // Genera un código aleatorio entre 1 y 30.
+        int code = random.nextInt(15) + 1; // Genera un código aleatorio entre 1 y 30.
 
         System.out.println("|-----------------------------------|");
         System.out.println("|             Alerta!!!             |");
@@ -342,7 +342,7 @@ public class App {
 
         System.out.println("\n|-------------------------------------------|");
         System.out.println("|              Para repararlo              |");
-        System.out.println("|       Adivina el número entre 1 y 30.     | ");
+        System.out.println("|       Adivina el número entre 1 y 15.     | ");
         System.out.println("|            Tienes 20 segundos.            |");
         System.out.println("|-------------------------------------------|");
 
