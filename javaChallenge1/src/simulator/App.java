@@ -6,6 +6,11 @@ public class App {
     private static final Scanner scanner = new Scanner(System.in); // Scanner global
     private static final Random random = new Random(); // Generador de números aleatorios
 
+    // Variables globales de recursos
+    private static int gasolina = 1000; // Stock inicial de gasolina
+    private static int oxigeno = 500;  // Stock inicial de oxígeno
+    private static int selectedPlanet = -1; // Índice del planeta seleccionado
+
     public static void main(String[] args) {
         boolean playAgain = true; // Condición para seguir jugando
 
@@ -56,15 +61,20 @@ public class App {
         System.out.println("2. Seleccionar nave espacial");
         System.out.println("3. Iniciar simulación del viaje");
         System.out.println("4. Salir");
+        System.out.println("\nRecursos actuales:");
+        System.out.println("Gasolina: " + gasolina);
+        System.out.println("Oxígeno: " + oxigeno);
     }
 
     public static void selectPlanet() {
         String[] planet = { "Marte", "Júpiter", "Saturno" };
         int[] distances = { 225000000, 778000000, 1427000000 };
+        int[] gasolinaCost = { 200, 500, 800 }; // Costos de gasolina según la distancia
+        int[] oxigenoCost = { 100, 300, 600 };  // Costos de oxígeno según la distancia
 
         System.out.println("\nPlanetas disponibles:");
         for (int i = 0; i < planet.length; i++) {
-            System.out.println((i + 1) + ". " + planet[i] + " - " + distances[i] + " km");
+            System.out.println((i + 1) + ". " + planet[i] + " - " + distances[i] + " km (Gasolina: " + gasolinaCost[i] + ", Oxígeno: " + oxigenoCost[i] + ")");
         }
 
         System.out.print("Seleccione un planeta (1-3): ");
@@ -72,8 +82,9 @@ public class App {
         scanner.nextLine();
 
         if (option >= 1 && option <= planet.length) {
-            System.out.println("Planeta seleccionado: " + planet[option - 1]);
-            System.out.println("Distancia al planeta: " + distances[option - 1] + " km");
+            selectedPlanet = option - 1; // Guardar el índice del planeta seleccionado
+            System.out.println("Planeta seleccionado: " + planet[selectedPlanet]);
+            System.out.println("Distancia al planeta: " + distances[selectedPlanet] + " km");
         } else {
             System.out.println("Selección no válida. Intente nuevamente.");
         }
@@ -82,8 +93,6 @@ public class App {
     public static void selectShip() {
         String[] ship = { "Falcon (100,000 km/h) capacidad max 8", "Millenium (150,000 km/h) capacidad max 4",
                 "Pegazo (200,000 km/h) capacidad max 3" };
-        int[] speed = { 100000, 150000, 200000 };
-
         System.out.println("\nNaves disponibles:");
         for (int i = 0; i < ship.length; i++) {
             System.out.println((i + 1) + ". " + ship[i]);
@@ -95,50 +104,56 @@ public class App {
 
         if (option >= 1 && option <= ship.length) {
             System.out.println("Nave seleccionada: " + ship[option - 1]);
-            System.out.println("Velocidad de la nave: " + speed[option - 1] + " km/h");
         } else {
             System.out.println("Selección no válida. Intente nuevamente.");
         }
     }
 
     public static void travelSimulator() throws InterruptedException {
-        System.out.println("Iniciando simulación del viaje...");
+        if (selectedPlanet == -1) {
+            System.out.println("Por favor selecciona un planeta primero.");
+            return;
+        }
 
-        // Simulamos progreso
+        int[] gasolinaCost = { 200, 500, 800 }; // Costos según el planeta
+        int[] oxigenoCost = { 100, 300, 600 };
+
+        // Verificar recursos disponibles antes de iniciar
+        if (gasolina < gasolinaCost[selectedPlanet] || oxigeno < oxigenoCost[selectedPlanet]) {
+            System.out.println("No tienes suficientes recursos para este viaje.");
+            System.out.println("Gasolina necesaria: " + gasolinaCost[selectedPlanet] + ", Oxígeno necesario: " + oxigenoCost[selectedPlanet]);
+            return;
+        }
+
+        System.out.println("Iniciando simulación del viaje...");
         for (int i = 20; i <= 100; i += 20) {
             System.out.println("Progreso: " + i + "% completado");
-            Thread.sleep(1000); // Espera 1 segundo entre incrementos
+            Thread.sleep(1000);
 
-            // Llamamos a los eventos aleatorios durante el progreso
-            if (Math.random() < 0.5) { // Evento aleatorio con una probabilidad del 50%
-                randomEvents(scanner, random); // Llamamos al evento aleatorio
+            // Posibilidad de un evento aleatorio
+            if (Math.random() < 0.5) {
+                boolean eventResolved = randomEvents();
+                if (!eventResolved) {
+                    System.out.println("El viaje no pudo completarse debido a un fallo en el evento.");
+                    return;
+                }
             }
         }
 
         System.out.println("¡Viaje completado con éxito!");
 
-        // Preguntar si desea jugar de nuevo
-        System.out.println("\n¿Quieres volver a jugar? (1 para sí, 2 para no)");
-        int playAgainOption = scanner.nextInt();
-        scanner.nextLine(); // Limpiar el buffer
+        // Descontar recursos después de completar el viaje
+        gasolina -= gasolinaCost[selectedPlanet];
+        oxigeno -= oxigenoCost[selectedPlanet];
 
-        if (playAgainOption == 1) {
-            // Reiniciar el menú si el usuario elige "sí"
-            System.out.println("¡Volveremos a iniciar el juego!");
-        } else if (playAgainOption == 2) {
-            // Finalizar el programa si el usuario elige "no"
-            System.out.println("Gracias por jugar. ¡Hasta luego!");
-            System.exit(0); // Cerrar el programa
-        } else {
-            System.out.println("Opción no válida. El programa se cerrará.");
-            System.exit(0); // Cerrar el programa si se ingresa una opción incorrecta
-        }
+        System.out.println("Recursos restantes:");
+        System.out.println("Gasolina: " + gasolina);
+        System.out.println("Oxígeno: " + oxigeno);
     }
 
-    private static boolean randomEvents(Scanner scanner, Random random) throws InterruptedException {
-        int randomMethod = random.nextInt(4); // Selección aleatoria del evento (0-3)
-
-        switch (randomMethod) {
+    private static boolean randomEvents() throws InterruptedException {
+        int randomEvent = random.nextInt(4); // Selección aleatoria del evento
+        switch (randomEvent) {
             case 0 -> {
                 return motorOff(scanner, random);
             }
@@ -157,6 +172,7 @@ public class App {
             }
         }
     }
+
 
     private static boolean motorOff(Scanner scanner, Random random) throws InterruptedException {
         System.out.println("|-----------------------------------|");
